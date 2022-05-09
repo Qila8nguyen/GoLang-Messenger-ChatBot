@@ -39,6 +39,26 @@ func Respond(ctx context.Context, recipientID, msgText string) error {
 	})
 }
 
+func popUpAllCoinButtons(ctx context.Context, recipientID string, buttons AttachmentButtons) error {
+	att := Attachment{
+		Type: "template",
+		Payload: AttachmentPayload{
+			TemplateType: "button",
+			Text:         "Get all coins",
+			Buttons:      buttons,
+		},
+	}
+	return callAPI(ctx, uriSendMessage, SendMessageRequest{
+		MessagingType: messageTypeResponse,
+		RecipientID: MessageRecipient{
+			ID: recipientID,
+		},
+		Message: Message{
+			Attachment: &att,
+		},
+	})
+}
+
 func callAPI(ctx context.Context, reqURI string, reqBody SendMessageRequest) error {
 	req := fasthttp.AcquireRequest()
 	defer fasthttp.ReleaseRequest(req)
@@ -66,17 +86,14 @@ func callAPI(ctx context.Context, reqURI string, reqBody SendMessageRequest) err
 		return fmt.Errorf("do deadline: %w", err)
 	}
 
-	resp := APIResponse{
-		// MessageID:   reqBody.Message.Mid,
-		// RecipientID: reqBody.RecipientID,
-	}
+	resp := APIResponse{}
 
 	err = json.Unmarshal(res.Body(), &resp)
 	if err != nil {
 		return fmt.Errorf("unmarshal response: %w", err)
 	}
 	if resp.Error != nil {
-		return fmt.Errorf("The response API is %s \n Response error: %s", resp.RecipientID, resp.Error.Error())
+		return fmt.Errorf("the response API is %s \n Response error: %s", resp.RecipientID, resp.Error.Error())
 	}
 	if res.StatusCode() != fasthttp.StatusOK {
 		return fmt.Errorf("unexpected rsponse status %d", res.StatusCode())

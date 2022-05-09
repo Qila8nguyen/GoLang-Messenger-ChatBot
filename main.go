@@ -1,11 +1,12 @@
 package main
 
 import (
-	"github.com/joho/godotenv"
 	"go-facebook-bot/pkg/fb"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func getEnv() {
@@ -23,7 +24,7 @@ func main() {
 
 	// port := ":4000"
 	log.Println(os.Getenv("PORT"))
-	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), nil))
+	log.Fatal(http.ListenAndServe(":8089", nil))
 }
 
 func homepageHandler(w http.ResponseWriter, r *http.Request) {

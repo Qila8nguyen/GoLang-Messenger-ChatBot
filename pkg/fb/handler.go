@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"regexp"
+	"strconv"
 
 	// "io"
 	// "github.com/joho/godotenv"
@@ -28,6 +30,8 @@ var (
 	errUnknownWebHookObject = errors.New("unknown web hook object")
 	errNoMessageEntry       = errors.New("there is no message entry")
 )
+
+var coinListTemp = []string{"Ethereum", "Bitcoin", "Spy"}
 
 // HandleMessenger handles all incoming webhooks from Facebook Messenger.
 func HandleMessenger(w http.ResponseWriter, r *http.Request) {
@@ -135,6 +139,62 @@ func handleMessage(recipientID, msgText string) error {
 	case "hello":
 		responseText = "world"
 	// @TODO your custom cases
+	case "GETALLCOINS":
+		{
+			var buttons AttachmentButtons
+			for i := 0; i < len(coinListTemp); i++ {
+				b := AttachmentButton{
+					Type:    "postback",
+					Title:   coinListTemp[i],
+					Payload: coinListTemp[i],
+				}
+				buttons = append(buttons, b)
+			}
+
+			return popUpAllCoinButtons(context.TODO(), recipientID, buttons)
+		}
+	case `UPPER*`:
+		{
+			re, _ := regexp.Compile("UPPER(.*)")
+			submatch := re.FindSubmatch([]byte(msgText))
+			upperbound, _ := strconv.Atoi(string(submatch[1]))
+			fmt.Println("Upper bound = ", upperbound)
+
+			responseText = "set upper bound successfully"
+		}
+
+	case `LOWER*`:
+		{
+			re, _ := regexp.Compile("LOWER(.*)")
+			submatch := re.FindSubmatch([]byte(msgText))
+			lowerbound, _ := strconv.Atoi(string(submatch[1]))
+			fmt.Println("LOWER bound = ", lowerbound)
+
+			responseText = "set lower bound successfully"
+		}
+
+	case `*hours*mins`:
+		{
+			// a := "124hours80mins"
+			// re, _ := regexp.Compile("(.*)hours(.*)mins")
+			// submatch := re.FindSubmatch([]byte(a))
+			// for _, v := range submatch {
+			// 	fmt.Println(string(v))
+			// }
+
+			re, _ := regexp.Compile("(.*)hours(.*)mins")
+			submatch := re.FindSubmatch([]byte(msgText))
+			for _, v := range submatch {
+				fmt.Println(string(v))
+			}
+			hour, _ := strconv.Atoi(string(submatch[1]))
+			min, _ := strconv.Atoi(string(submatch[2]))
+
+			sum := hour*60 + min
+			fmt.Println(sum)
+
+			responseText = "set time successfully"
+		}
 	default:
 		responseText = "What can I do for you?"
 	}
