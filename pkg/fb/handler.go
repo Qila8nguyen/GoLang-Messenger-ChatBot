@@ -135,67 +135,50 @@ func handleMessage(recipientID, msgText string) error {
 	fmt.Printf("handle Message step has recipientID = %s \n", recipientID)
 
 	var responseText string
-	switch msgText {
-	case "hello":
-		responseText = "world"
+	// switch msgText {
+	// case "hello":
+	// 	responseText = "world"
 	// @TODO your custom cases
-	case "GETALLCOINS":
-		{
-			var buttons AttachmentButtons
-			for i := 0; i < len(coinListTemp); i++ {
-				b := AttachmentButton{
-					Type:    "postback",
-					Title:   coinListTemp[i],
-					Payload: coinListTemp[i],
-				}
-				buttons = append(buttons, b)
+	if msgText == "GETALLCOINS" {
+		var buttons AttachmentButtons
+		for i := 0; i < len(coinListTemp); i++ {
+			b := AttachmentButton{
+				Type:    "postback",
+				Title:   coinListTemp[i],
+				Payload: coinListTemp[i],
 			}
-
-			return popUpAllCoinButtons(context.TODO(), recipientID, buttons)
+			buttons = append(buttons, b)
 		}
-	case `UPPER*`:
-		{
-			re, _ := regexp.Compile("UPPER(.*)")
-			submatch := re.FindSubmatch([]byte(msgText))
-			upperbound, _ := strconv.Atoi(string(submatch[1]))
-			fmt.Println("Upper bound = ", upperbound)
+		return popUpAllCoinButtons(context.TODO(), recipientID, buttons)
 
-			responseText = "set upper bound successfully"
+	} else if strings.Contains(msgText, "UPPER") {
+		re, _ := regexp.Compile("UPPER(.*)")
+		submatch := re.FindSubmatch([]byte(msgText))
+		upperbound, _ := strconv.Atoi(string(submatch[1]))
+		fmt.Println("Upper bound = ", upperbound)
+
+		responseText = "set upper bound successfully"
+	} else if strings.Contains(msgText, "LOWER") {
+		re, _ := regexp.Compile("LOWER(.*)")
+		submatch := re.FindSubmatch([]byte(msgText))
+		lowerbound, _ := strconv.Atoi(string(submatch[1]))
+		fmt.Println("LOWER bound = ", lowerbound)
+
+		responseText = "set lower bound successfully"
+	} else if strings.Contains(msgText, "mins") {
+		re, _ := regexp.Compile("(.*)hours(.*)mins")
+		submatch := re.FindSubmatch([]byte(msgText))
+		for _, v := range submatch {
+			fmt.Println(string(v))
 		}
+		hour, _ := strconv.Atoi(string(submatch[1]))
+		min, _ := strconv.Atoi(string(submatch[2]))
 
-	case `LOWER*`:
-		{
-			re, _ := regexp.Compile("LOWER(.*)")
-			submatch := re.FindSubmatch([]byte(msgText))
-			lowerbound, _ := strconv.Atoi(string(submatch[1]))
-			fmt.Println("LOWER bound = ", lowerbound)
+		sum := hour*60 + min
+		fmt.Println(sum)
 
-			responseText = "set lower bound successfully"
-		}
-
-	case `*hours*mins`:
-		{
-			// a := "124hours80mins"
-			// re, _ := regexp.Compile("(.*)hours(.*)mins")
-			// submatch := re.FindSubmatch([]byte(a))
-			// for _, v := range submatch {
-			// 	fmt.Println(string(v))
-			// }
-
-			re, _ := regexp.Compile("(.*)hours(.*)mins")
-			submatch := re.FindSubmatch([]byte(msgText))
-			for _, v := range submatch {
-				fmt.Println(string(v))
-			}
-			hour, _ := strconv.Atoi(string(submatch[1]))
-			min, _ := strconv.Atoi(string(submatch[2]))
-
-			sum := hour*60 + min
-			fmt.Println(sum)
-
-			responseText = "set time successfully"
-		}
-	default:
+		responseText = "set time successfully"
+	} else {
 		responseText = "What can I do for you?"
 	}
 
