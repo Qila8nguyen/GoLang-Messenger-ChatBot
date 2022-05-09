@@ -157,6 +157,9 @@ func handleMessage(recipientID, msgText string) error {
 		upperbound, _ := strconv.Atoi(string(submatch[1]))
 		fmt.Println("Upper bound = ", upperbound)
 
+		//save upperBound
+
+		//response
 		responseText = "set upper bound successfully"
 	} else if strings.Contains(msgText, "LOWER") {
 		re, _ := regexp.Compile("LOWER(.*)")
@@ -164,6 +167,9 @@ func handleMessage(recipientID, msgText string) error {
 		lowerbound, _ := strconv.Atoi(string(submatch[1]))
 		fmt.Println("LOWER bound = ", lowerbound)
 
+		//handle lowerBound
+
+		//response
 		responseText = "set lower bound successfully"
 	} else if strings.Contains(msgText, "mins") {
 		re, _ := regexp.Compile("(.*)hours(.*)mins")
@@ -177,6 +183,9 @@ func handleMessage(recipientID, msgText string) error {
 		sum := hour*60 + min
 		fmt.Println(sum)
 
+		//handle Time
+
+		//response
 		responseText = "set time successfully"
 	} else {
 		responseText = "What can I do for you?"

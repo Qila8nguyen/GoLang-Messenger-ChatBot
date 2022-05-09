@@ -5,19 +5,17 @@ import (
 	"log"
 	"net/http"
 	"os"
-
-	"github.com/joho/godotenv"
 )
 
-func getEnv() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-}
+// func getEnv() {
+// 	err := godotenv.Load()
+// 	if err != nil {
+// 		log.Fatal("Error loading .env file")
+// 	}
+// }
 
 func main() {
-	getEnv()
+	// getEnv()
 
 	http.HandleFunc("/webhook", fb.HandleMessenger)
 	http.HandleFunc("/", homepageHandler)
